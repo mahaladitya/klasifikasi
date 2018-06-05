@@ -3,8 +3,8 @@ library(tm)
 library(SnowballC)
 library(arm)
 # Training data.
-data <- c('Bom mapolres surabaya adalah pengalihan isu.', 'Fans Liverpool mengadakan demo di depan kantor dubes spanyol di Indonesia', 'Serbuan Tenaga Kerja China ke Indonesia yang berjumlah 10 juta', 'Gerakan Rush Money',  'Keterangan Pers soal Gaji ke-13 dan THR', 'Heboh Jackie Chan Masuk Islam.', 'Bahaya Cool Fever yang menempel di Dahi', 'Pesan Berantai Korban Tragedi Mina', 'Campuran Udang dan Vitamin C Dapat Menjadi Racun yang Berbahaya.', 'Berita Pancing Hujan Menggunakan Air Garam di Baskom',
-          'Peledakan bom mapolres surabaya menelan 5 korban jiwa.', 'Serbuan Tenaga Kerja China ke Indonesia hanya ribuan', 'Rush Money merupakan kebohongan.', 'Demo di depan kantor dubes spanyol di Indonesia dibatalkan', 'Kementerian Keuangan Memastikan bahwa Keterangan Pers tersebut tidak benar.',  'Tidak ada konfirmasi resmi dari pihak Jackie Chan mengenai kepindahan dia masuk Islam.', 'dokter di Indonesia dan Malaysia menyangkal berita tersebut dan mengatakan tidak benar.', 'Korban tersebut memang korban tragedi Mina namun yang terjadi pada tahun 2004.', 'keracunan akibat mengkonsumsi udang dan vitamin C dalam waktu berdekatan tidaklah benar.', 'Air garam dalam baskom itu tidak bisa membuat uap dan menyebabkan hujan turun.')
+data <- c('hasil real count di rutan kpk dimenangkan anies sandi.', 'poster bertuliskan jika anies kalah akan ada muslim revolusi.', 'di rutan kpk ahok djarot tidak mendapat suara.', 'tidak terdapat foto ktp peserta pemilu yang memiliki kesamaan nama dan nik.',  'saat rekapitulasi di daerah tebet ahok djarot mendapat tambahan suara', 'Heboh Jackie Chan Masuk Islam.', 'Bahaya Cool Fever yang menempel di Dahi', 'Pesan Berantai Korban Tragedi Mina', 'Campuran Udang dan Vitamin C Dapat Menjadi Racun yang Berbahaya.', 'Berita Pancing Hujan Menggunakan Air Garam di Baskom',
+          'ahok djarot yang memenangkan suara di rutan kpk.', 'tidak ada poster ancaman jika anies kalah', 'ahok dan djarot memperoleh suara terbanyak yaitu 61 suara.', 'foto ktp peserta pemilu memiliki kesamaan nama dan nik.', 'tidak ada penambahan suara saat rekapitulasi di daerah tebet', 'Tidak ada konfirmasi resmi dari pihak Jackie Chan mengenai kepindahan dia masuk Islam.', 'dokter di Indonesia dan Malaysia menyangkal berita tersebut dan mengatakan tidak benar.', 'Korban tersebut memang korban tragedi Mina namun yang terjadi pada tahun 2004.', 'keracunan akibat mengkonsumsi udang dan vitamin C dalam waktu berdekatan tidaklah benar.', 'Air garam dalam baskom itu tidak bisa membuat uap dan menyebabkan hujan turun.')
 corpus <- VCorpus(VectorSource(data))
 
 # Create a document term matrix.
@@ -27,8 +27,8 @@ fit <- train(y ~ ., data = train, method = 'bayesglm')
 predict(fit, newdata = train)
 
 # Test data.
-data2 <- c('Jatuh korban jiwa dalam ledakan bom di mapolres surabaya.', 'Demo tersebut ditunggangi aktor politik', 'bank kehabisan dana tunai yang mengakibatkan sistem perbankan menjadi kacau.', '20 juta tenaga kerja China yang datang ke Indonesia.', 'Kemenkeu akan memberikan Gaji ke-13 dan THR',
-           'Jumlah Tenaga Kerja asal China sekitar 21.000.', 'Jackie sedang dalam acara pemberian gelar Datuk kepadanya di Malaysia.', 'Demo di depan kantor dubes spanyol di Indonesia dibatalkan karena kesalahpahaman', 'Udang dan vitamin C boleh dimakan secara berdekatan.', 'Air garam dalam baskom itu tidak bisa membuat uap dan menyebabkan hujan turun.')
+data2 <- c('server kpu dikendalikan oleh ainun najib yang mendukung jokowi.', 'server kpu berpusat di singapura.', 'suara ahok djarot bertambah 200.', 'server kpu di tingkat kelurahan dibobol.', 'ktp ganda dengan foto yang sama.',
+           'ainun najib yang menggagas pilkada.', 'server kpu di imam bonjol.', 'suara ahok djarot tetap sama yaitu 61 suara.', 'tidak ada server di tingkat kelurahan.', 'foto ktp yang sama ternyata dipalsukan.')
 corpus <- VCorpus(VectorSource(data2))
 tdm <- DocumentTermMatrix(corpus, control = list(dictionary = Terms(tdm), removePunctuation = TRUE, stopwords = TRUE, stemming = TRUE, removeNumbers = TRUE))
 test <- as.matrix(tdm)
