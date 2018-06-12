@@ -1,65 +1,47 @@
 library(tm)
+library(ggplot2)
+library(wordcloud)
 library(plyr)
-library(class)
-libs=c("tm","plyr","class")
-lapply(libs,require,character.only = T)
-options(stringsAsFactors= F)
-cat = c("1553_K-2017.pdf","2829_K-PDT-2017-KABUL-ato.pdf")
-pathname = "D:/PDF"
-cleanCorpus <-function(corpus) {
-  corpus.tmp = tm_map(corpus,removePunctuation)
-  corpus.tmp = tm_map(corpus.tmp,stripWhitespace)
-  corpus.tmp = tm_map(corpus.tmp,tolower)
-  corpus.tmp = tm_map(corpus.tmp,removeWords,stopwords("english"))
-  corpus.tmp = tm_map(corpus.tmp,stemDocument)
-  return(corpus.tmp)
-}
-generateTDM <- function(cate,path) {
-  s.path =  sprintf("%s/%s",path,cate)
-  csv = readPDF(s.path)
-  s.cor = Corpus(DataframeSource(csv))
-  s.cor.cl = cleanCorpus(s.cor)
-  s.tdm= TermDocumentMatrix(s.cor.cl)
-  s.tdm = removeSparseTerms(s.tdm,0.7)
-  result <-list(name= cate,tdm = s.tdm)
-}
-tdm = lapply(cat,generateTDM,path = pathname)
+library(RTextTools)
+library(e1071)
+#referensi https://rstudio-pubs-static.s3.amazonaws.com/31867_8236987cf0a8444e962ccd2aec46d9c3.html
+cname <- file.path("D:/PDF")   
+cname   
+dir(cname)  
+docs <- Corpus(DirSource(cname))   
 
-# attach name
-bindCategoryTDM <- function(tdm) {
-  s.mat = t(data.matrix(tdm[["tdm"]]))
-  s.df = as.data.frame(s.mat,stringsAsFactors = F)
-  s.df = cbind(s.df,rep(tdm[["name"]],nrow(s.df)))
-  colnames(s.df)[ncol(s.df)] <- "targetCat"
-  return(s.df)
-  
-}
+summary(docs)
+inspect(docs[2])
+docs <- tm_map(docs, removePunctuation)  
+docs <- tm_map(docs, removeNumbers)  
+docs <- tm_map(docs, tolower)  
+docs <- tm_map(docs, removeWords, c("dapat", "yang","adalah","untuk","dan"))  
 
-catTDM = lapply(tdm,bindCategoryTDM)
+dtm <- DocumentTermMatrix(docs)   
+dtm   
+tdm <- TermDocumentMatrix(docs)   
+tdm   
 
-#Stack 
-tdm.stack = do.call(rbind.fill,catTDM)
-tdm.stack[is.na(tdm.stack)] = 0
+freq <- colSums(as.matrix(dtm))   
+length(freq) 
 
-#holdout
-train.idx <- sample(nrow(tdm.stack),ceiling(nrow(tdm.stack) * 0.7))
-text.idx = (1:nrow(tdm.stack))[-train.idx]
-
-
-#model
-tdm.cat = tdm.stack[,"targetCat"]
-tdm.stack.nl = tdm.stack[,!colnames(tdm.stack) %in% "targetCat"]
-knn.pred = knn(tdm.stack.nl[train.idx,],tdm.stack.nl[text.idx,],tdm.cat[train.idx])
-
-
-#accuracy
-conf.mat = table("predictions" = knn.pred,Actual = tdm.cat[text.idx])
-accuracy = sum(diag(conf.mat)/length(text.idx) *100)
-accuracy
-conf.mat 
-
-
----------------------------------------------------------------------
-  inspect(stem) - display the content in the Corpus
-corpus <- Corpus(DataframeSource(csvpath)) - read all the documents in csv
-findFreqTerms(tdm, 300) - frequency of terms
+m <- as.matrix(dtm)   
+dim(m)   
+write.csv(m, file="dtm.csv")  
+dtms <- removeSparseTerms(dtm, 0.1) # This makes a matrix that is 10% empty space, maximum.   
+inspect(dtms)
+ord <- order(freq) 
+freq[head(ord)]  
+findFreqTerms(dtm, lowfreq=10) 
+library(ggplot2)   
+wf <- data.frame(word=names(freq), freq=freq)   
+head(wf)
+p <- ggplot(subset(wf, freq>50), aes(word, freq))    
+p <- p + geom_bar(stat="identity")   
+p <- p + theme(axis.text.x=element_text(angle=45, hjust=1))   
+p   
+library(wordcloud) 
+set.seed(142)   
+wordcloud(names(freq), freq, min.freq=5)  
+set.seed(142)   
+wordcloud(names(freq), freq, min.freq=2, scale=c(5, .1), colors=brewer.pal(6, "Dark2"))
